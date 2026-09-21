@@ -9,7 +9,19 @@ export async function getProducts() {
 
   const data = await response.json();
 
-  return Array.isArray(data) ? data : [];
+  if (Array.isArray(data)) {
+    return data;
+  }
+
+  if (Array.isArray(data.products)) {
+    return data.products;
+  }
+
+  if (Array.isArray(data.data)) {
+    return data.data;
+  }
+
+  return [];
 }
 
 export async function getProductById(id) {
@@ -19,7 +31,9 @@ export async function getProductById(id) {
     throw new Error("Failed to fetch product");
   }
 
-  return await response.json();
+  const data = await response.json();
+
+  return data.product || data.data || data;
 }
 
 export async function loginUser(credentials) {

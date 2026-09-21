@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
 
-const API_URL = "https://elysia-olfylpqo.b4a.run/api";
 
 const categories = [
   "All",

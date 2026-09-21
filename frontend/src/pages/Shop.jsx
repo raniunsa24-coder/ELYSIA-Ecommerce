@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { getProducts } from "../services/api";
 import ProductCard from "../components/ProductCard";
+
+const API_URL = "https://elysia-olfylpqo.b4a.run/api";
 
 const categories = [
   "All",
@@ -16,6 +17,7 @@ function Shop() {
   const [category, setCategory] = useState("All");
   const [sort, setSort] = useState("Featured");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get("search") || "";
@@ -25,16 +27,42 @@ function Shop() {
 
     async function loadProducts() {
       try {
-        const data = await getProducts();
+        setLoading(true);
+        setError("");
 
-        if (active) {
-          setProducts(Array.isArray(data) ? data : []);
+        const response = await fetch(`${API_URL}/products`);
+
+        if (!response.ok) {
+          throw new Error(
+            `Products API returned ${response.status}`
+          );
         }
-      } catch (error) {
-        console.error("Failed to load products:", error);
+
+        const data = await response.json();
+
+        const productList = Array.isArray(data)
+          ? data
+          : Array.isArray(data.products)
+            ? data.products
+            : Array.isArray(data.data)
+              ? data.data
+              : [];
+
+        if (!active) return;
+
+        setProducts(productList);
+
+        if (productList.length === 0) {
+          setError("No products were returned from the API.");
+        }
+      } catch (err) {
+        console.error("Failed to load products:", err);
 
         if (active) {
           setProducts([]);
+          setError(
+            err?.message || "Unable to connect to the products API."
+          );
         }
       } finally {
         if (active) {
@@ -110,9 +138,7 @@ function Shop() {
             <button
               key={item}
               type="button"
-              className={
-                category === item ? "active" : ""
-              }
+              className={category === item ? "active" : ""}
               onClick={() => setCategory(item)}
             >
               {item}
@@ -122,9 +148,7 @@ function Shop() {
 
         <select
           value={sort}
-          onChange={(event) =>
-            setSort(event.target.value)
-          }
+          onChange={(event) => setSort(event.target.value)}
           aria-label="Sort products"
         >
           <option>Featured</option>
@@ -136,6 +160,10 @@ function Shop() {
       {loading ? (
         <div className="shop-status">
           Loading collection...
+        </div>
+      ) : error ? (
+        <div className="shop-status">
+          {error}
         </div>
       ) : visibleProducts.length === 0 ? (
         <div className="shop-status">

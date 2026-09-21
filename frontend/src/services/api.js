@@ -1,4 +1,4 @@
-const API_URL = "https://elysia-olfylpqo.b4a.run/api";
+const API_URL = "https://elysia-cn1lhksf.b4a.run/api";
 
 export async function getProducts() {
   const response = await fetch(`${API_URL}/products`);

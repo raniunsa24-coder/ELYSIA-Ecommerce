@@ -9,19 +9,11 @@ export async function getProducts() {
 
   const data = await response.json();
 
-  if (Array.isArray(data)) {
-    return data;
+  if (!Array.isArray(data)) {
+    throw new Error("Invalid products response");
   }
 
-  if (Array.isArray(data.products)) {
-    return data.products;
-  }
-
-  if (Array.isArray(data.data)) {
-    return data.data;
-  }
-
-  return [];
+  return data;
 }
 
 export async function getProductById(id) {
@@ -31,9 +23,7 @@ export async function getProductById(id) {
     throw new Error("Failed to fetch product");
   }
 
-  const data = await response.json();
-
-  return data.product || data.data || data;
+  return await response.json();
 }
 
 export async function loginUser(credentials) {

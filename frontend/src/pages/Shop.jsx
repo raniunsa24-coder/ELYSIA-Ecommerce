@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
-
+import { getProducts } from "../services/api";
 
 const categories = [
   "All",
@@ -29,31 +29,11 @@ function Shop() {
         setLoading(true);
         setError("");
 
-        const response = await fetch(`${API_URL}/products`);
-
-        if (!response.ok) {
-          throw new Error(
-            `Products API returned ${response.status}`
-          );
-        }
-
-        const data = await response.json();
-
-        const productList = Array.isArray(data)
-          ? data
-          : Array.isArray(data.products)
-            ? data.products
-            : Array.isArray(data.data)
-              ? data.data
-              : [];
+        const data = await getProducts();
 
         if (!active) return;
 
-        setProducts(productList);
-
-        if (productList.length === 0) {
-          setError("No products were returned from the API.");
-        }
+        setProducts(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error("Failed to load products:", err);
 

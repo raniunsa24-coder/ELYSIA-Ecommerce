@@ -7,12 +7,15 @@ import {
 } from "lucide-react";
 
 import { useCart } from "../context/CartContext";
+import { createOrder } from "../services/api";
 
 function Checkout() {
   const { cart, cartTotal, clearCart } = useCart();
 
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [orderId, setOrderId] = useState("");
 
   const [form, setForm] = useState({
     firstName: "",
@@ -25,22 +28,53 @@ function Checkout() {
   });
 
   function handleChange(event) {
-    setForm({
-      ...form,
-      [event.target.name]: event.target.value,
-    });
+    const { name, value } = event.target;
+
+    setForm((currentForm) => ({
+      ...currentForm,
+      [name]: value,
+    }));
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
 
-    setLoading(true);
+    if (loading || cart.length === 0) {
+      return;
+    }
 
-    setTimeout(() => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const orderData = {
+        customer: form,
+
+        items: cart.map((item) => ({
+          product: item._id,
+          name: item.name,
+          price: Number(item.price),
+          quantity: Number(item.quantity) || 1,
+          image: item.image || "",
+        })),
+
+        total: Number(cartTotal),
+      };
+
+      const result = await createOrder(orderData);
+
+      setOrderId(result.order?._id || "");
+
       clearCart();
-      setLoading(false);
       setSubmitted(true);
-    }, 1000);
+    } catch (err) {
+      setError(
+        err?.message ||
+          "Something went wrong. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
   }
 
   if (submitted) {
@@ -51,13 +85,24 @@ function Checkout() {
 
           <span>ORDER RECEIVED</span>
 
-          <h1>Thank you for shopping with ELYSIA.</h1>
+          <h1>
+            Thank you for shopping with ELYSIA.
+          </h1>
 
           <p>
             Your order has been successfully placed.
           </p>
 
-          <Link to="/shop" className="dark-button">
+          {orderId && (
+            <p>
+              Order ID: <strong>{orderId}</strong>
+            </p>
+          )}
+
+          <Link
+            to="/shop"
+            className="dark-button"
+          >
             Continue shopping
           </Link>
         </div>
@@ -71,7 +116,14 @@ function Checkout() {
         <div className="empty-cart">
           <h1>Your cart is empty.</h1>
 
-          <Link to="/shop" className="dark-button">
+          <p>
+            Add something to your cart before checking out.
+          </p>
+
+          <Link
+            to="/shop"
+            className="dark-button"
+          >
             Go to shop
           </Link>
         </div>
@@ -81,7 +133,10 @@ function Checkout() {
 
   return (
     <main className="checkout-page">
-      <Link to="/cart" className="back-link">
+      <Link
+        to="/cart"
+        className="back-link"
+      >
         <ArrowLeft size={16} />
         Back to cart
       </Link>
@@ -97,9 +152,11 @@ function Checkout() {
               <label>
                 First name
                 <input
+                  type="text"
                   name="firstName"
                   value={form.firstName}
                   onChange={handleChange}
+                  autoComplete="given-name"
                   required
                 />
               </label>
@@ -107,9 +164,11 @@ function Checkout() {
               <label>
                 Last name
                 <input
+                  type="text"
                   name="lastName"
                   value={form.lastName}
                   onChange={handleChange}
+                  autoComplete="family-name"
                   required
                 />
               </label>
@@ -122,6 +181,7 @@ function Checkout() {
                 name="email"
                 value={form.email}
                 onChange={handleChange}
+                autoComplete="email"
                 required
               />
             </label>
@@ -129,9 +189,11 @@ function Checkout() {
             <label>
               Phone
               <input
+                type="tel"
                 name="phone"
                 value={form.phone}
                 onChange={handleChange}
+                autoComplete="tel"
                 required
               />
             </label>
@@ -139,9 +201,11 @@ function Checkout() {
             <label>
               Address
               <input
+                type="text"
                 name="address"
                 value={form.address}
                 onChange={handleChange}
+                autoComplete="street-address"
                 required
               />
             </label>
@@ -150,9 +214,11 @@ function Checkout() {
               <label>
                 City
                 <input
+                  type="text"
                   name="city"
                   value={form.city}
                   onChange={handleChange}
+                  autoComplete="address-level2"
                   required
                 />
               </label>
@@ -160,13 +226,21 @@ function Checkout() {
               <label>
                 Postal code
                 <input
+                  type="text"
                   name="postalCode"
                   value={form.postalCode}
                   onChange={handleChange}
+                  autoComplete="postal-code"
                   required
                 />
               </label>
             </div>
+
+            {error && (
+              <p className="form-error">
+                {error}
+              </p>
+            )}
 
             <button
               type="submit"
@@ -179,7 +253,7 @@ function Checkout() {
                     size={16}
                     className="loading-icon"
                   />
-                  Processing...
+                  Placing order...
                 </>
               ) : (
                 "Place order"
@@ -191,29 +265,34 @@ function Checkout() {
         <aside className="checkout-summary">
           <span>YOUR ORDER</span>
 
-          {cart.map((item) => (
-            <div
-              className="checkout-item"
-              key={item._id}
-            >
-              <span>
-                {item.name} × {item.quantity}
-              </span>
+          {cart.map((item) => {
+            const quantity =
+              Number(item.quantity) || 1;
 
-              <strong>
-                $
-                {(
-                  Number(item.price) *
-                  Number(item.quantity)
-                ).toFixed(2)}
-              </strong>
-            </div>
-          ))}
+            const price =
+              Number(item.price) || 0;
+
+            return (
+              <div
+                className="checkout-item"
+                key={item._id}
+              >
+                <span>
+                  {item.name} × {quantity}
+                </span>
+
+                <strong>
+                  ${(price * quantity).toFixed(2)}
+                </strong>
+              </div>
+            );
+          })}
 
           <div className="summary-total">
             <span>Total</span>
+
             <strong>
-              ${cartTotal.toFixed(2)}
+              ${Number(cartTotal).toFixed(2)}
             </strong>
           </div>
         </aside>

@@ -71,6 +71,18 @@ function Navbar() {
           >
             Shop
           </Link>
+
+          <Link
+            to="/admin"
+            className={
+              location.pathname === "/admin" ||
+              location.pathname === "/admin/orders"
+                ? "active"
+                : ""
+            }
+          >
+            Admin
+          </Link>
         </nav>
 
         <div className="nav-actions">
@@ -148,13 +160,21 @@ function Navbar() {
         </div>
       )}
 
-      <div className={`mobile-menu ${menuOpen ? "open" : ""}`}>
+      <div
+        className={`mobile-menu ${
+          menuOpen ? "open" : ""
+        }`}
+      >
         <Link to="/" onClick={closeMenu}>
           Home
         </Link>
 
         <Link to="/shop" onClick={closeMenu}>
           Shop
+        </Link>
+
+        <Link to="/admin" onClick={closeMenu}>
+          Admin
         </Link>
 
         <Link to="/login" onClick={closeMenu}>

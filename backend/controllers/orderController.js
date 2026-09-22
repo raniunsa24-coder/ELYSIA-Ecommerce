@@ -6,7 +6,8 @@ async function createOrder(req, res) {
 
     if (!customer || !items || !items.length || total === undefined) {
       return res.status(400).json({
-        message: "Customer details, products and total are required.",
+        message:
+          "Customer details, products and total are required.",
       });
     }
 
@@ -67,8 +68,58 @@ async function getOrderById(req, res) {
   }
 }
 
+async function updateOrderStatus(req, res) {
+  try {
+    const { status } = req.body;
+
+    const allowedStatuses = [
+      "pending",
+      "confirmed",
+      "shipped",
+      "delivered",
+      "cancelled",
+    ];
+
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({
+        message: "Invalid order status.",
+      });
+    }
+
+    const order = await Order.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    if (!order) {
+      return res.status(404).json({
+        message: "Order not found.",
+      });
+    }
+
+    res.json({
+      message: "Order status updated successfully.",
+      order,
+    });
+  } catch (error) {
+    console.error(
+      "Update order status error:",
+      error.message
+    );
+
+    res.status(500).json({
+      message: "Unable to update order status.",
+    });
+  }
+}
+
 module.exports = {
   createOrder,
   getOrders,
   getOrderById,
+  updateOrderStatus,
 };

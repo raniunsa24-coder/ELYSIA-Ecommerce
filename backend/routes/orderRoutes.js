@@ -7,11 +7,16 @@ const {
   updateOrderStatus,
 } = require("../controllers/orderController");
 
+const { protect, adminOnly } = require("../middleware/authMiddleware");
+
 const router = express.Router();
 
 router.post("/", createOrder);
-router.get("/", getOrders);
-router.get("/:id", getOrderById);
-router.patch("/:id", updateOrderStatus);
+
+router.get("/", protect, adminOnly, getOrders);
+
+router.get("/:id", protect, adminOnly, getOrderById);
+
+router.patch("/:id", protect, adminOnly, updateOrderStatus);
 
 module.exports = router;

@@ -42,7 +42,11 @@ function Login() {
         );
       }
 
-      navigate("/");
+      if (data.user?.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
     } catch (err) {
       setError(err.message || "Login failed.");
     } finally {

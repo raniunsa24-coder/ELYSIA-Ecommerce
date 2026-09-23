@@ -47,12 +47,6 @@ async function startServer() {
   try {
     await connectDB();
 
-    console.log("MongoDB URI present:", !!process.env.MONGO_URI);
-    console.log(
-      "MongoDB database:",
-      require("mongoose").connection.name
-    );
-
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });

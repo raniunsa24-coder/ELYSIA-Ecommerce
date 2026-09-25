@@ -14,6 +14,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import AdminOrders from "./pages/AdminOrders";
 import AdminDashboard from "./pages/AdminDashboard";
+import ProductsAdmin from "./pages/ProductsAdmin";
 
 function App() {
   const { notification } = useCart();
@@ -34,6 +35,7 @@ function App() {
         <Route element={<ProtectedRoute adminOnly />}>
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/orders" element={<AdminOrders />} />
+          <Route path="/admin/products" element={<ProductsAdmin />} />
         </Route>
       </Routes>
 

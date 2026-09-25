@@ -14,6 +14,7 @@ function Cart() {
     increaseQuantity,
     decreaseQuantity,
     removeFromCart,
+    clearCart,
     cartTotal,
   } = useCart();
 
@@ -41,14 +42,31 @@ function Cart() {
   return (
     <main className="cart-page">
       <div className="cart-header">
-        <span>YOUR BAG</span>
-        <h1>Shopping cart.</h1>
+        <div>
+          <span>YOUR BAG</span>
+          <h1>Shopping cart.</h1>
+        </div>
+
+        <button
+          type="button"
+          className="clear-cart-button"
+          onClick={clearCart}
+        >
+          <Trash2 size={14} />
+          Clear cart
+        </button>
       </div>
 
       <div className="cart-layout">
         <section className="cart-items">
           {cart.map((item) => {
-            const quantity = item.quantity || 1;
+            const quantity = Math.max(
+              1,
+              Number(item.quantity) || 1
+            );
+
+            const itemTotal =
+              Number(item.price || 0) * quantity;
 
             return (
               <article
@@ -71,7 +89,7 @@ function Cart() {
                   <h2>{item.name}</h2>
 
                   <p>
-                    ${Number(item.price).toFixed(2)}
+                    ${Number(item.price || 0).toFixed(2)}
                   </p>
 
                   <div className="cart-item-bottom">
@@ -113,10 +131,7 @@ function Cart() {
                 </div>
 
                 <strong className="cart-item-total">
-                  $
-                  {(
-                    Number(item.price) * quantity
-                  ).toFixed(2)}
+                  ${itemTotal.toFixed(2)}
                 </strong>
               </article>
             );
@@ -125,6 +140,11 @@ function Cart() {
 
         <aside className="cart-summary">
           <span>ORDER SUMMARY</span>
+
+          <div className="summary-row">
+            <span>Items</span>
+            <strong>{cart.length}</strong>
+          </div>
 
           <div className="summary-row">
             <span>Subtotal</span>

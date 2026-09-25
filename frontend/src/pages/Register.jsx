@@ -33,7 +33,11 @@ function Register() {
       setLoading(true);
       setError("");
 
-      const data = await registerUser(form);
+      const data = await registerUser({
+        name: form.name.trim(),
+        email: form.email.trim(),
+        password: form.password,
+      });
 
       if (data.token) {
         localStorage.setItem("elysia-token", data.token);
@@ -75,13 +79,16 @@ function Register() {
         <form
           className="register-form"
           onSubmit={handleSubmit}
+          autoComplete="off"
         >
           <label>
             Full name
             <input
+              type="text"
               name="name"
               value={form.name}
               onChange={handleChange}
+              autoComplete="off"
               required
             />
           </label>
@@ -93,6 +100,7 @@ function Register() {
               name="email"
               value={form.email}
               onChange={handleChange}
+              autoComplete="off"
               required
             />
           </label>
@@ -104,6 +112,7 @@ function Register() {
               name="password"
               value={form.password}
               onChange={handleChange}
+              autoComplete="new-password"
               minLength={6}
               required
             />

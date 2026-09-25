@@ -1,83 +1,90 @@
-const API_URL = "https://elysia-hg3qhckr.b4a.run/api";
+const API_URL = "https://elysia-meyrk4k6.b4a.run/api";
 
 export async function getProducts() {
-const response = await fetch(`${API_URL}/products`);
+  const response = await fetch(`${API_URL}/products`);
 
-if (!response.ok) {
-throw new Error("Failed to fetch products");
-}
+  if (!response.ok) {
+    throw new Error("Failed to fetch products");
+  }
 
-const data = await response.json();
+  const data = await response.json();
 
-if (!Array.isArray(data)) {
-throw new Error("Invalid products response");
-}
+  if (!Array.isArray(data)) {
+    throw new Error("Invalid products response");
+  }
 
-return data;
+  return data;
 }
 
 export async function getProductById(id) {
-const response = await fetch(`${API_URL}/products/${id}`);
+  const response = await fetch(`${API_URL}/products/${id}`);
 
-if (!response.ok) {
-throw new Error("Failed to fetch product");
-}
+  if (!response.ok) {
+    throw new Error("Failed to fetch product");
+  }
 
-return await response.json();
+  return await response.json();
 }
 
 export async function loginUser(credentials) {
-const response = await fetch(`${API_URL}/auth/login`, {
-method: "POST",
-headers: {
-"Content-Type": "application/json",
-},
-body: JSON.stringify(credentials),
-});
+  const response = await fetch(`${API_URL}/auth/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(credentials),
+  });
 
-const data = await response.json();
+  const data = await response.json();
 
-if (!response.ok) {
-throw new Error(data.message || "Login failed");
-}
+  if (!response.ok) {
+    throw new Error(data.message || "Login failed");
+  }
 
-return data;
+  return data;
 }
 
 export async function registerUser(userData) {
-const response = await fetch(`${API_URL}/auth/register`, {
-method: "POST",
-headers: {
-"Content-Type": "application/json",
-},
-body: JSON.stringify(userData),
-});
+  const response = await fetch(`${API_URL}/auth/register`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(userData),
+  });
 
-const data = await response.json();
+  const data = await response.json();
 
-if (!response.ok) {
-throw new Error(data.message || "Registration failed");
-}
+  if (!response.ok) {
+    throw new Error(data.message || "Registration failed");
+  }
 
-return data;
+  return data;
 }
 
 export async function createOrder(orderData) {
-const response = await fetch(`${API_URL}/orders`, {
-method: "POST",
-headers: {
-"Content-Type": "application/json",
-},
-body: JSON.stringify(orderData),
-});
+  const token = localStorage.getItem("elysia-token");
 
-const data = await response.json();
+  if (!token) {
+    throw new Error("Please login before placing an order.");
+  }
 
-if (!response.ok) {
-throw new Error(
-data.message || "Failed to place order"
-);
-}
+  const response = await fetch(`${API_URL}/orders`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(orderData),
+  });
 
-return data;
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data.message || "Failed to place order"
+    );
+  }
+
+  return data;
 }

@@ -5,6 +5,7 @@ import {
   UserRound,
   Menu,
   X,
+  LogOut,
 } from "lucide-react";
 import { useState } from "react";
 import { useCart } from "../context/CartContext";
@@ -19,8 +20,32 @@ function Navbar() {
 
   const { cart = [] } = useCart();
 
+  const storedUser = localStorage.getItem("elysia-user");
+  const token = localStorage.getItem("elysia-token");
+
+  let user = null;
+
+  try {
+    user = storedUser ? JSON.parse(storedUser) : null;
+  } catch {
+    user = null;
+  }
+
+  const isLoggedIn = Boolean(token && user);
+  const isAdmin = user?.role === "admin";
+
   function closeMenu() {
     setMenuOpen(false);
+  }
+
+  function handleLogout() {
+    localStorage.removeItem("elysia-token");
+    localStorage.removeItem("elysia-user");
+
+    setMenuOpen(false);
+    setSearchOpen(false);
+
+    navigate("/login");
   }
 
   function handleSearch(event) {
@@ -65,24 +90,24 @@ function Navbar() {
 
           <Link
             to="/shop"
-            className={
-              location.pathname === "/shop" ? "active" : ""
-            }
+            className={location.pathname === "/shop" ? "active" : ""}
           >
             Shop
           </Link>
 
-          <Link
-            to="/admin"
-            className={
-              location.pathname === "/admin" ||
-              location.pathname === "/admin/orders"
-                ? "active"
-                : ""
-            }
-          >
-            Admin
-          </Link>
+          {isAdmin && (
+            <Link
+              to="/admin"
+              className={
+                location.pathname === "/admin" ||
+                location.pathname === "/admin/orders"
+                  ? "active"
+                  : ""
+              }
+            >
+              Admin
+            </Link>
+          )}
         </nav>
 
         <div className="nav-actions">
@@ -117,6 +142,17 @@ function Navbar() {
             )}
           </Link>
 
+          {isLoggedIn && (
+            <button
+              type="button"
+              className="icon-button"
+              aria-label="Logout"
+              onClick={handleLogout}
+            >
+              <LogOut size={19} strokeWidth={1.7} />
+            </button>
+          )}
+
           <button
             type="button"
             className="menu-button"
@@ -146,9 +182,7 @@ function Navbar() {
             <input
               type="text"
               value={searchValue}
-              onChange={(event) =>
-                setSearchValue(event.target.value)
-              }
+              onChange={(event) => setSearchValue(event.target.value)}
               placeholder="Search products..."
               autoFocus
             />
@@ -160,11 +194,7 @@ function Navbar() {
         </div>
       )}
 
-      <div
-        className={`mobile-menu ${
-          menuOpen ? "open" : ""
-        }`}
-      >
+      <div className={`mobile-menu ${menuOpen ? "open" : ""}`}>
         <Link to="/" onClick={closeMenu}>
           Home
         </Link>
@@ -173,9 +203,11 @@ function Navbar() {
           Shop
         </Link>
 
-        <Link to="/admin" onClick={closeMenu}>
-          Admin
-        </Link>
+        {isAdmin && (
+          <Link to="/admin" onClick={closeMenu}>
+            Admin
+          </Link>
+        )}
 
         <Link to="/login" onClick={closeMenu}>
           Account
@@ -185,6 +217,17 @@ function Navbar() {
           Cart
           {cart.length > 0 && ` (${cart.length})`}
         </Link>
+
+        {isLoggedIn && (
+          <button
+            type="button"
+            className="mobile-logout"
+            onClick={handleLogout}
+          >
+            <LogOut size={17} />
+            Logout
+          </button>
+        )}
       </div>
     </>
   );

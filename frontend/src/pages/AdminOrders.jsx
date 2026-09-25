@@ -6,7 +6,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 
-const API_URL = "https://elysia-g6qv1kji.b4a.run/api";
+const API_URL = "https://elysia-meyrk4k6.b4a.run/api";
 
 const orderStatuses = [
   "pending",
@@ -27,13 +27,19 @@ function AdminOrders() {
       setLoading(true);
       setError("");
 
-      const response = await fetch(`${API_URL}/orders`);
+      const token = localStorage.getItem("elysia-token");
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch orders.");
-      }
+      const response = await fetch(`${API_URL}/orders`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to fetch orders.");
+      }
 
       if (!Array.isArray(data)) {
         throw new Error("Invalid orders response.");
@@ -41,9 +47,7 @@ function AdminOrders() {
 
       setOrders(data);
     } catch (err) {
-      setError(
-        err?.message || "Unable to load orders."
-      );
+      setError(err?.message || "Unable to load orders.");
     } finally {
       setLoading(false);
     }
@@ -58,23 +62,21 @@ function AdminOrders() {
       setUpdating(orderId);
       setError("");
 
-      const response = await fetch(
-        `${API_URL}/orders/${orderId}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ status }),
-        }
-      );
+      const token = localStorage.getItem("elysia-token");
+
+      const response = await fetch(`${API_URL}/orders/${orderId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status }),
+      });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(
-          data.message || "Failed to update order."
-        );
+        throw new Error(data.message || "Failed to update order.");
       }
 
       setOrders((currentOrders) =>
@@ -85,9 +87,7 @@ function AdminOrders() {
         )
       );
     } catch (err) {
-      setError(
-        err?.message || "Unable to update order."
-      );
+      setError(err?.message || "Unable to update order.");
     } finally {
       setUpdating("");
     }
@@ -96,10 +96,7 @@ function AdminOrders() {
   if (loading) {
     return (
       <main className="admin-orders-page page-status">
-        <LoaderCircle
-          size={28}
-          className="loading-icon"
-        />
+        <LoaderCircle size={28} className="loading-icon" />
         <span>Loading orders...</span>
       </main>
     );
@@ -127,11 +124,7 @@ function AdminOrders() {
         </button>
       </div>
 
-      {error && (
-        <div className="form-error">
-          {error}
-        </div>
-      )}
+      {error && <div className="form-error">{error}</div>}
 
       {orders.length === 0 ? (
         <div className="admin-empty-state">

@@ -8,8 +8,7 @@ import {
   Truck,
   XCircle,
 } from "lucide-react";
-
-const API_URL = "https://elysia-g6qv1kji.b4a.run/api";
+const API_URL = "https://elysia-meyrk4k6.b4a.run/api";
 
 function AdminDashboard() {
   const [orders, setOrders] = useState([]);
@@ -17,13 +16,23 @@ function AdminDashboard() {
 
   async function loadOrders() {
     try {
-      const response = await fetch(`${API_URL}/orders`);
+      setLoading(true);
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch orders.");
-      }
+      const token = localStorage.getItem("elysia-token");
+
+      const response = await fetch(`${API_URL}/orders`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Failed to fetch orders."
+        );
+      }
 
       setOrders(Array.isArray(data) ? data : []);
     } catch (error) {

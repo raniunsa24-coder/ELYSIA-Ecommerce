@@ -75,6 +75,7 @@ function Login() {
         <form
           className="login-form"
           onSubmit={handleSubmit}
+          autoComplete="off"
         >
           <label>
             Email address
@@ -83,6 +84,7 @@ function Login() {
               name="email"
               value={form.email}
               onChange={handleChange}
+              autoComplete="off"
               required
             />
           </label>
@@ -94,6 +96,7 @@ function Login() {
               name="password"
               value={form.password}
               onChange={handleChange}
+              autoComplete="new-password"
               required
             />
           </label>

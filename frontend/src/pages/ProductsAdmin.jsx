@@ -8,7 +8,7 @@ import {
   X,
 } from "lucide-react";
 
-const API_URL = "https://elysia-meyrk4k6.b4a.run/api";
+const API_URL = "https://elysia-r374leng.b4a.run/api";
 
 const emptyForm = {
   name: "",

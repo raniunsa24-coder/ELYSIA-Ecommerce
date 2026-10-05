@@ -1,7 +1,7 @@
-const API_URL = "https://elysia-r374leng.b4a.run/api";
+const API_URL = "https://elysia-eufg9fhr.b4a.run";
 
 export async function getProducts() {
-  const response = await fetch(`${API_URL}/products`);
+  const response = await fetch(`${API_URL}/api/products`);
 
   if (!response.ok) {
     throw new Error("Failed to fetch products");
@@ -17,7 +17,7 @@ export async function getProducts() {
 }
 
 export async function getProductById(id) {
-  const response = await fetch(`${API_URL}/products/${id}`);
+  const response = await fetch(`${API_URL}/api/products/${id}`);
 
   if (!response.ok) {
     throw new Error("Failed to fetch product");
@@ -27,7 +27,7 @@ export async function getProductById(id) {
 }
 
 export async function loginUser(credentials) {
-  const response = await fetch(`${API_URL}/auth/login`, {
+  const response = await fetch(`${API_URL}/api/auth/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -45,7 +45,7 @@ export async function loginUser(credentials) {
 }
 
 export async function registerUser(userData) {
-  const response = await fetch(`${API_URL}/auth/register`, {
+  const response = await fetch(`${API_URL}/api/auth/register`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -69,7 +69,7 @@ export async function createOrder(orderData) {
     throw new Error("Please login before placing an order.");
   }
 
-  const response = await fetch(`${API_URL}/orders`, {
+  const response = await fetch(`${API_URL}/api/orders`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -81,9 +81,7 @@ export async function createOrder(orderData) {
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(
-      data.message || "Failed to place order"
-    );
+    throw new Error(data.message || "Failed to place order");
   }
 
   return data;

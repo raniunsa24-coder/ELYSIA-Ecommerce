@@ -3,12 +3,13 @@ import {
   Edit3,
   Image,
   LoaderCircle,
+  Package,
   Plus,
   Trash2,
   X,
 } from "lucide-react";
 
-const API_URL = "https://elysia-r374leng.b4a.run/api";
+const API_URL = "https://elysia-eufg9fhr.b4a.run";
 
 const emptyForm = {
   name: "",
@@ -35,7 +36,7 @@ function ProductsAdmin() {
       setLoading(true);
       setError("");
 
-      const response = await fetch(`${API_URL}/products`);
+      const response = await fetch(`${API_URL}/api/products`);
       const data = await response.json();
 
       if (!response.ok) {
@@ -85,7 +86,11 @@ function ProductsAdmin() {
     setError("");
     setMessage("");
     setShowForm(true);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   }
 
   function closeForm() {
@@ -131,17 +136,23 @@ function ProductsAdmin() {
         throw new Error("Please fill in all product fields.");
       }
 
-      if (!Number.isFinite(productData.price) || productData.price < 0) {
+      if (
+        !Number.isFinite(productData.price) ||
+        productData.price < 0
+      ) {
         throw new Error("Please enter a valid price.");
       }
 
-      if (!Number.isInteger(productData.stock) || productData.stock < 0) {
+      if (
+        !Number.isInteger(productData.stock) ||
+        productData.stock < 0
+      ) {
         throw new Error("Stock must be a whole number.");
       }
 
       const url = editingId
-        ? `${API_URL}/products/${editingId}`
-        : `${API_URL}/products`;
+        ? `${API_URL}/api/products/${editingId}`
+        : `${API_URL}/api/products`;
 
       const response = await fetch(url, {
         method: editingId ? "PUT" : "POST",
@@ -164,15 +175,19 @@ function ProductsAdmin() {
       if (editingId) {
         setProducts((currentProducts) =>
           currentProducts.map((product) =>
-            product._id === editingId ? data.product : product
+            product._id === editingId
+              ? data.product
+              : product
           )
         );
+
         setMessage("Product updated successfully.");
       } else {
         setProducts((currentProducts) => [
           data.product,
           ...currentProducts,
         ]);
+
         setMessage("Product added successfully.");
       }
 
@@ -207,7 +222,7 @@ function ProductsAdmin() {
       }
 
       const response = await fetch(
-        `${API_URL}/products/${productId}`,
+        `${API_URL}/api/products/${productId}`,
         {
           method: "DELETE",
           headers: {
@@ -241,7 +256,10 @@ function ProductsAdmin() {
   if (loading) {
     return (
       <main className="admin-products-page page-status">
-        <LoaderCircle size={28} className="loading-icon" />
+        <LoaderCircle
+          size={28}
+          className="loading-icon"
+        />
         <span>Loading products...</span>
       </main>
     );
@@ -253,15 +271,24 @@ function ProductsAdmin() {
         <div>
           <span>ADMIN</span>
           <h1>Product management.</h1>
-          <p>Manage the products available in your ELYSIA store.</p>
+          <p>
+            Manage the products available in your ELYSIA store.
+          </p>
         </div>
 
         <button
           type="button"
           className="admin-dashboard-button"
-          onClick={showForm ? closeForm : openCreateForm}
+          onClick={
+            showForm ? closeForm : openCreateForm
+          }
         >
-          {showForm ? <X size={16} /> : <Plus size={16} />}
+          {showForm ? (
+            <X size={16} />
+          ) : (
+            <Plus size={16} />
+          )}
+
           {showForm ? "Close" : "Add product"}
         </button>
       </div>
@@ -272,15 +299,24 @@ function ProductsAdmin() {
         </div>
       )}
 
-      {error && <div className="form-error">{error}</div>}
+      {error && (
+        <div className="form-error">
+          {error}
+        </div>
+      )}
 
       {showForm && (
         <section className="admin-product-form-section">
           <div className="admin-section-heading">
             <div>
-              <span>{editingId ? "EDIT" : "NEW PRODUCT"}</span>
+              <span>
+                {editingId ? "EDIT" : "NEW PRODUCT"}
+              </span>
+
               <h2>
-                {editingId ? "Update product." : "Add product."}
+                {editingId
+                  ? "Update product."
+                  : "Add product."}
               </h2>
             </div>
           </div>
@@ -292,6 +328,7 @@ function ProductsAdmin() {
             <div className="admin-product-form-grid">
               <label>
                 Product name
+
                 <input
                   name="name"
                   value={form.name}
@@ -303,6 +340,7 @@ function ProductsAdmin() {
 
               <label>
                 Category
+
                 <input
                   name="category"
                   value={form.category}
@@ -314,6 +352,7 @@ function ProductsAdmin() {
 
               <label>
                 Price
+
                 <input
                   type="number"
                   name="price"
@@ -328,6 +367,7 @@ function ProductsAdmin() {
 
               <label>
                 Stock
+
                 <input
                   type="number"
                   name="stock"
@@ -343,6 +383,7 @@ function ProductsAdmin() {
 
             <label>
               Image URL
+
               <input
                 type="url"
                 name="image"
@@ -355,6 +396,7 @@ function ProductsAdmin() {
 
             <label>
               Description
+
               <textarea
                 name="description"
                 value={form.description}
@@ -386,7 +428,10 @@ function ProductsAdmin() {
                       size={16}
                       className="loading-icon"
                     />
-                    {editingId ? "Updating..." : "Adding..."}
+
+                    {editingId
+                      ? "Updating..."
+                      : "Adding..."}
                   </>
                 ) : (
                   <>
@@ -395,7 +440,10 @@ function ProductsAdmin() {
                     ) : (
                       <Plus size={16} />
                     )}
-                    {editingId ? "Update product" : "Add product"}
+
+                    {editingId
+                      ? "Update product"
+                      : "Add product"}
                   </>
                 )}
               </button>
@@ -411,14 +459,20 @@ function ProductsAdmin() {
             <h2>Store catalogue.</h2>
           </div>
 
-          <span>{products.length} products</span>
+          <span>
+            {products.length} products
+          </span>
         </div>
 
         {products.length === 0 ? (
           <div className="admin-empty-state">
             <PackageIcon />
+
             <h2>No products yet.</h2>
-            <p>Add your first product to the ELYSIA catalogue.</p>
+
+            <p>
+              Add your first product to the ELYSIA catalogue.
+            </p>
           </div>
         ) : (
           <div className="admin-products-grid">
@@ -439,7 +493,9 @@ function ProductsAdmin() {
                 </div>
 
                 <div className="admin-product-card-content">
-                  <span>{product.category}</span>
+                  <span>
+                    {product.category}
+                  </span>
 
                   <h2>{product.name}</h2>
 
@@ -449,18 +505,26 @@ function ProductsAdmin() {
 
                   <div className="admin-product-meta">
                     <strong>
-                      ${Number(product.price || 0).toFixed(2)}
+                      $
+                      {Number(
+                        product.price || 0
+                      ).toFixed(2)}
                     </strong>
 
                     <span>
-                      Stock: {Number(product.stock || 0)}
+                      Stock:{" "}
+                      {Number(
+                        product.stock || 0
+                      )}
                     </span>
                   </div>
 
                   <div className="admin-product-actions">
                     <button
                       type="button"
-                      onClick={() => openEditForm(product)}
+                      onClick={() =>
+                        openEditForm(product)
+                      }
                     >
                       <Edit3 size={15} />
                       Edit
@@ -470,9 +534,13 @@ function ProductsAdmin() {
                       type="button"
                       className="admin-delete-button"
                       onClick={() =>
-                        handleDelete(product._id)
+                        handleDelete(
+                          product._id
+                        )
                       }
-                      disabled={deleting === product._id}
+                      disabled={
+                        deleting === product._id
+                      }
                     >
                       {deleting === product._id ? (
                         <LoaderCircle
@@ -482,6 +550,7 @@ function ProductsAdmin() {
                       ) : (
                         <Trash2 size={15} />
                       )}
+
                       Delete
                     </button>
                   </div>

@@ -51,7 +51,7 @@ https://github.com/raniunsa24-coder/ELYSIA-Ecommerce
 ### Deployment
 - Vercel
 
-## 📌 Features
+## Features
 
 ### Shopping Experience
 - Browse available products
